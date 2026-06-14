@@ -119,4 +119,56 @@ int main()
         cout << "Please choose an option A, B, or C." << endl;
     }
 
-}
+    //for loop, runs a fixed number of times (7)
+    int StitchesInADay;
+    int StitchesInAWeek;
+    int day;
+
+    day = 1;
+    StitchesInAWeek = 0;
+    for (day=1; day <= 7; day++)
+    {
+        cout << "Enter the number of stitches you completed today: ";
+        cin >> StitchesInADay;
+        cout << endl;
+
+        StitchesInAWeek = StitchesInAWeek + StitchesInADay;
+    }
+
+    cout << "On average, you complete " << StitchesInAWeek / 7 << " stitches a day." << endl;
+
+    //while loop, condition based
+    string status;
+
+    cout << "What is the status of your current project? " << endl;
+    cin >> status;
+
+    while (status != "completed")
+    {
+        cout << "Hopefully, you will finish soon!" << endl;
+        cout << "What is the status of your current project? " << endl;
+        cin >> status;
+    }
+
+    cout << "Yay! You have finished your current project! Time to start a new one :)" << endl;
+
+    //do...while loop, until quit
+    int ColorCompleted;
+    string answer;
+
+    ColorCompleted = 0;
+
+    do
+    {
+        cout << "Have you completed a new color?" << endl;
+        cin >> answer;
+
+        if (answer == "yes")
+        {
+            ColorCompleted = ColorCompleted + 1;
+            cout << "You have completed " << ColorCompleted << " colors so far." << endl;
+        }
+    } 
+    while (answer == "yes");
+    cout << "You completed " << ColorCompleted << " colors total." << endl;
+ }
