@@ -168,12 +168,34 @@ int main()
     cout << "\n";
 
     //menu using switch
+//<<<<<<< Week6-KaylenAnderson
+    char menu{};
+    cout << "Please choose an option- A: a list of unfinished patterns, B: current progress, or C: how much you currently spend on each skein of thread." << endl;
+    cin >> menu;
+    switch (menu)
+    {
+    case 'A':
+        cout << "Patterns that you have started but not yet finished include: cats, flowers, a stack of books, and a tiger." << endl;
+        break;
+    case 'B':
+        cout << "You are currently " << percent << "% through your current project." << endl;
+        break;
+    case 'C':
+        cout << "You are currently paying $" << price << " for each skein of thread." << endl;
+        break; 
+    default:
+        cout << "Please choose an option A, B, or C." << endl;
+    }
+=======
     MenuDisplay(percent, price);
+//>>>>>>> main
 
     //for loop, runs a fixed number of times (7)
     int StitchesInADay;
     int StitchesInAWeek;
-    int day;
+    int day; 
+    // ------------------- ARRAY -------------------
+    int stitchArray[7]; // Array for storing stitch amounts per day 
 
     day = 1;
     StitchesInAWeek = 0;
@@ -184,6 +206,19 @@ int main()
         cout << endl;
 
         StitchesInAWeek = StitchesInAWeek + StitchesInADay;
+
+        // Saves each stitch amount for that day in an array
+        stitchArray[day - 1] = StitchesInADay;
+        // Successfully stored
+        cout << "Stored: " << stitchArray[day - 1] << endl;
+    }
+    // ------------------- ENUM + Display -------------------
+    enum Day { MON, TUE, WED, THU, FRI, SAT, SUN };
+
+    for (int i = MON; i <= SUN; i++)
+    {
+        // Displays day and stich amount to screen
+        cout << "Day " << (i + 1) << ": " << stitchArray[i] << endl;
     }
 
     cout << "On average, you complete " << StitchesInAWeek / 7 << " stitches a day." << endl;
