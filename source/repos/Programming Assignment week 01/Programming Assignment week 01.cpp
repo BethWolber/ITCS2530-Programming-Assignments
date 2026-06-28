@@ -2,15 +2,34 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+#include <limits>
+#include <windows.h>
 using namespace std;
 
-int main()
+//function to display banner
+void PrintBanner()
 {
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
     //new banner
+    SetConsoleTextAttribute(h, 13);
     cout << "Welcome! This program was created to help keep track of information related to cross stitching as a hobby!" << endl;
 
     cout << "\n";
+}
 
+//function to change console color
+void ChangeConsoleColor()
+{
+    int color;
+    HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
+    cout << "If you would like to change the color of the text, please enter your preferred color number here 1-15 (current color is 13): " << endl;
+    cin >> color;
+    SetConsoleTextAttribute(h, color);
+}
+
+//function to collect and validate inout
+void PatternProgress()
+{
     //first question, get pattern
     string pattern;
     cout << "What cross stitch pattern are you currently working on? ";
@@ -36,6 +55,51 @@ int main()
 
     cout << "\n";
 
+}
+
+//function to display the menu
+void MenuDisplay(int percent, double price)
+{
+    char menu{};
+    cout << "Please choose an option- A: a list of unfinished patterns, B: current progress, or C: how much you currently spend on each skein of thread." << endl;
+    cin >> menu;
+    switch (menu)
+    {
+    case 'A':
+        cout << "Patterns that you have started but not yet finished include: cats, flowers, a stack of books, and a tiger." << endl;
+        break;
+    case 'B':
+        cout << "You are currently " << percent << "% through your current project." << endl;
+        break;
+    case 'C':
+        cout << "You are currently paying $" << price << " for each skein of thread." << endl;
+    default:
+        cout << "Please choose an option A, B, or C." << endl;
+    }
+}
+
+//function for a calculation
+void ExactPercentage()
+{
+    double CompletedStitches;
+    double TotalStitches;
+    double PercentCompleted;
+    cout << "How many stitches have you completed so far?" << endl;
+    cin >> CompletedStitches;
+    cout << "How many stitches are there total in the pattern?" << endl;
+    cin >> TotalStitches;
+    PercentCompleted = (CompletedStitches * 100) / TotalStitches;
+    cout << "You are exactly " << PercentCompleted << "% of the way through your pattern." << endl;
+}
+
+int main()
+{
+    PrintBanner();
+
+    ChangeConsoleColor();
+
+    PatternProgress();
+
     //new input #1
     int progress;
     cout << "How many pieces are you currently working on? ";
@@ -45,7 +109,7 @@ int main()
     //new input #3
     string favorite;
     cout << "What is your favorite pattern you have completed so far? ";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin.ignore((numeric_limits<streamsize>::max)(), '\n');
     getline(cin, favorite);
     cout << endl;
 
@@ -87,6 +151,8 @@ int main()
 
     cout << "\n";
 
+    ExactPercentage();
+
     //second if/else block
     int percent;
     cout << "How far into your current project are you percentage-wise? ";
@@ -102,6 +168,7 @@ int main()
     cout << "\n";
 
     //menu using switch
+//<<<<<<< Week6-KaylenAnderson
     char menu{};
     cout << "Please choose an option- A: a list of unfinished patterns, B: current progress, or C: how much you currently spend on each skein of thread." << endl;
     cin >> menu;
@@ -119,6 +186,9 @@ int main()
     default:
         cout << "Please choose an option A, B, or C." << endl;
     }
+=======
+    MenuDisplay(percent, price);
+//>>>>>>> main
 
     //for loop, runs a fixed number of times (7)
     int StitchesInADay;
