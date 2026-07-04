@@ -11,10 +11,18 @@ struct clubMembership {
     string name;
     int number;
     double memberDonation;
-}
+};
 
-// ------------------- ENUM FOR HOBBY DIFFICULTY -------------------
+// ------------------- ENUM FOR HOBBY DIFFICULTY -------------
 enum Difficulty { EASY, INTERMEDIATE, HARD };
+
+// ------------------- STITCH SESSION STRUCT -------------------
+struct stitchSession {
+    string date;
+    int stitches;
+    Difficulty level;
+};
+
 
 // ------------------- FUNCTION USING ARRAY -------------------
 double averagePrices(const double prices[], int size)
@@ -45,16 +53,80 @@ void fillPrices(double prices[], int size)
         prices[i] = value;
     }
 }
+// ------------------ FUNCTION FOR STRUCT ------------------ 
+void FillSession(stitchSession& session)
+{
+    cout << "Enter session date: ";
+    cin >> session.date;
+
+    cout << "Enter stitch completed: ";
+    cin >> session.stitches;
+
+    int lvl;
+    cout << "Enter difficulty (0=Easy, 1=Intermediate, 2=Hard): ";
+    cin >> lvl;
+
+    session.level = static_cast<Difficulty>(lvl);
+}
+void PrintSession(const stitchSession& session)
+{
+    cout << "Date: " << session.date << endl;
+    cout << "Stitches: " << session.stitches << endl;
+
+    cout << "Difficulty: ";
+    switch (session.level)
+    {
+    case EASY: 
+        cout << "Easy";
+        break;
+    case INTERMEDIATE: 
+        cout << "Intermediate"; 
+        break;
+    case HARD: 
+        cout << "Hard"; 
+        break;
+    }
+}
+
+double AverageSessionStitches(const stitchSession sessions[], int size)
+{
+    int total = 0;
+    for (int i = 0; i < size; i++)
+        total += sessions[i].stitches;
+
+    return static_cast<double>(total) / size;
+}
 
 //function to display banner
-void PrintBanner()
+bool PrintBanner()
 {
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-    //new banner
     SetConsoleTextAttribute(h, 13);
+
     cout << "Welcome! This program was created to help keep track of information related to cross stitching as a hobby!" << endl;
 
-    cout << "\n";
+    bool hasMembership;
+    cout << "Do you have a membership? (1=true, 0=false): ";
+    cin >> hasMembership;
+
+    if (hasMembership)
+    {
+        clubMembership member;
+        cout << "Enter name: ";
+        cin >> member.name;
+        cout << "Enter phone number: ";
+        cin >> member.number;
+        cout << "Enter donation amount: ";
+        cin >> member.memberDonation;
+
+        cout << "Thanks for being a member, " << member.name << "!" << endl;
+    }
+    else
+    {
+        cout << "No membership? No problem, enjoy the program!" << endl;
+    }
+
+    return hasMembership;
 }
 
 //function to change console color
@@ -115,7 +187,7 @@ void MenuDisplay(int percent, double price)
         cout << "You are currently paying $" << price << " for each skein of thread." << endl;
         break;
     default:
-        cout << "Please choose an option A, B, or C." << endl;
+        cout << "Invalid option. Please choose an option A, B, or C." << endl;
     }
 }
 
@@ -140,6 +212,25 @@ int main()
     ChangeConsoleColor();
 
     PatternProgress();
+
+    const int SESSION_COUNT = 3;
+    stitchSession sessions[SESSION_COUNT];
+
+    cout << "Enter stitching session data: " << endl;
+    for (int i = 0; i < SESSION_COUNT; i++)
+    {
+        cout << "Session " << (i + 1) << ":" << endl;
+        FillSession(sessions[i]);
+    }
+    cout << "Session Summary: " << endl;
+    for (int i = 0; i < SESSION_COUNT; i++)
+    {
+        PrintSession(sessions[i]);
+        cout << endl;
+    }
+
+    cout << "Average stitches per session:  " << AverageSessionStitches(sessions, SESSION_COUNT) << endl;
+    
 
     //new input #1
     int progress;
@@ -305,15 +396,6 @@ int main()
     } 
     while (answer == "yes");
     cout << "You completed " << ColorCompleted << " colors total." << endl;
-    // ------------------- STORED MEMBERSHIP DATA -------------------
-    const int MAX_MEMBERS = 3;
     
-    // ------------------- MEMBERSHIP -------------------
-    clubMembership member1;
-    cout << "Enter name: " << endl;
-    cin >> member1.name;
-    cout << "Enter phone number: " << endl;
-    cin >> member1.number;
-    cout << "Make a donation. Enter donation amount: " << endl;
-    cin >> member1.memberDonation;
+    return 0;
  }
