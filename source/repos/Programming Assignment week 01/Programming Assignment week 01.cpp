@@ -5,16 +5,128 @@
 #include <limits>
 #include <windows.h>
 using namespace std;
+ 
+// ------------------- MEMBERSHIP STRUCT -------------------
+struct clubMembership {
+    string name;
+    int number;
+    double memberDonation;
+};
+
+// ------------------- ENUM FOR HOBBY DIFFICULTY -------------
+enum Difficulty { EASY, INTERMEDIATE, HARD };
+
+// ------------------- STITCH SESSION STRUCT -------------------
+struct stitchSession {
+    string date;
+    int stitches;
+    Difficulty level;
+};
+
+
+// ------------------- FUNCTION USING ARRAY -------------------
+double averagePrices(const double prices[], int size)
+{
+    double total = 0;
+    for (int i = 0; i < size; i++)
+    {
+        total += prices[i];
+    }
+    return total / size;
+}
+
+// Grab user input for array 
+void fillPrices(double prices[], int size)
+{
+    for (int i = 0; i < size; i++)
+    {
+        double value;
+        cout << "Enter price #" << (i + 1) << ": ";
+
+        while (!(cin >> value) || value <= 0)
+        {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid price. Enter a positive number: ";
+        }
+
+        prices[i] = value;
+    }
+}
+// ------------------ FUNCTION FOR STRUCT ------------------ 
+void FillSession(stitchSession& session)
+{
+    cout << "Enter session date: ";
+    cin >> session.date;
+
+    cout << "Enter stitch completed: ";
+    cin >> session.stitches;
+
+    int lvl;
+    cout << "Enter difficulty (0=Easy, 1=Intermediate, 2=Hard): ";
+    cin >> lvl;
+
+    session.level = static_cast<Difficulty>(lvl);
+}
+void PrintSession(const stitchSession& session)
+{
+    cout << "Date: " << session.date << endl;
+    cout << "Stitches: " << session.stitches << endl;
+
+    cout << "Difficulty: ";
+    switch (session.level)
+    {
+    case EASY: 
+        cout << "Easy";
+        break;
+    case INTERMEDIATE: 
+        cout << "Intermediate"; 
+        break;
+    case HARD: 
+        cout << "Hard"; 
+        break;
+    }
+}
+
+double AverageSessionStitches(const stitchSession sessions[], int size)
+{
+    int total = 0;
+    for (int i = 0; i < size; i++)
+        total += sessions[i].stitches;
+
+    return static_cast<double>(total) / size;
+}
 
 //function to display banner
-void PrintBanner()
+bool PrintBanner()
 {
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-    //new banner
     SetConsoleTextAttribute(h, 13);
+
     cout << "Welcome! This program was created to help keep track of information related to cross stitching as a hobby!" << endl;
 
-    cout << "\n";
+    bool hasMembership;
+    cout << "Do you have a membership? (1=true, 0=false): ";
+    cin >> hasMembership;
+
+    if (hasMembership)
+    {
+        clubMembership member;
+        cout << "Enter name: ";
+        cin >> member.name;
+        cout << "Enter phone number: ";
+        cin >> member.number;
+        cout << "Enter donation amount: ";
+        cin >> member.memberDonation;
+
+        cout << "Thanks for being a member, " << member.name << "!" << endl;
+    }
+    else
+    {
+        cout << "No membership? No problem, enjoy the program!" << endl;
+    }
+
+    return hasMembership;
 }
 
 //function to change console color
@@ -73,8 +185,9 @@ void MenuDisplay(int percent, double price)
         break;
     case 'C':
         cout << "You are currently paying $" << price << " for each skein of thread." << endl;
+        break;
     default:
-        cout << "Please choose an option A, B, or C." << endl;
+        cout << "Invalid option. Please choose an option A, B, or C." << endl;
     }
 }
 
@@ -99,6 +212,25 @@ int main()
     ChangeConsoleColor();
 
     PatternProgress();
+
+    const int SESSION_COUNT = 3;
+    stitchSession sessions[SESSION_COUNT];
+
+    cout << "Enter stitching session data: " << endl;
+    for (int i = 0; i < SESSION_COUNT; i++)
+    {
+        cout << "Session " << (i + 1) << ":" << endl;
+        FillSession(sessions[i]);
+    }
+    cout << "Session Summary: " << endl;
+    for (int i = 0; i < SESSION_COUNT; i++)
+    {
+        PrintSession(sessions[i]);
+        cout << endl;
+    }
+
+    cout << "Average stitches per session:  " << AverageSessionStitches(sessions, SESSION_COUNT) << endl;
+    
 
     //new input #1
     int progress;
@@ -167,61 +299,68 @@ int main()
 
     cout << "\n";
 
-    //menu using switch
-//<<<<<<< Week6-KaylenAnderson
-    char menu{};
-    cout << "Please choose an option- A: a list of unfinished patterns, B: current progress, or C: how much you currently spend on each skein of thread." << endl;
-    cin >> menu;
-    switch (menu)
-    {
-    case 'A':
-        cout << "Patterns that you have started but not yet finished include: cats, flowers, a stack of books, and a tiger." << endl;
-        break;
-    case 'B':
-        cout << "You are currently " << percent << "% through your current project." << endl;
-        break;
-    case 'C':
-        cout << "You are currently paying $" << price << " for each skein of thread." << endl;
-        break; 
-    default:
-        cout << "Please choose an option A, B, or C." << endl;
-    }
-=======
     MenuDisplay(percent, price);
-//>>>>>>> main
 
-    //for loop, runs a fixed number of times (7)
     int StitchesInADay;
-    int StitchesInAWeek;
-    int day; 
-    // ------------------- ARRAY -------------------
-    int stitchArray[7]; // Array for storing stitch amounts per day 
+    int StitchesInAWeek = 0;
+    int stitchArray[7];
 
-    day = 1;
-    StitchesInAWeek = 0;
-    for (day=1; day <= 7; day++)
+    for (int day = 1; day <= 7; day++)
     {
         cout << "Enter the number of stitches you completed today: ";
         cin >> StitchesInADay;
         cout << endl;
 
-        StitchesInAWeek = StitchesInAWeek + StitchesInADay;
-
-        // Saves each stitch amount for that day in an array
+        StitchesInAWeek += StitchesInADay;
         stitchArray[day - 1] = StitchesInADay;
-        // Successfully stored
+
         cout << "Stored: " << stitchArray[day - 1] << endl;
     }
-    // ------------------- ENUM + Display -------------------
+
     enum Day { MON, TUE, WED, THU, FRI, SAT, SUN };
 
     for (int i = MON; i <= SUN; i++)
     {
-        // Displays day and stich amount to screen
         cout << "Day " << (i + 1) << ": " << stitchArray[i] << endl;
     }
 
     cout << "On average, you complete " << StitchesInAWeek / 7 << " stitches a day." << endl;
+
+    // ------------------- NEW ARRAY FEATURE -------------------
+    const int PRICE_COUNT = 5;
+    double priceArray[PRICE_COUNT];
+
+    cout << "\nLet's record the last " << PRICE_COUNT << " thread prices you paid.\n";
+    fillPrices(priceArray, PRICE_COUNT);
+
+    double avgPrice = averagePrices(priceArray, PRICE_COUNT);
+
+    cout << "\nAverage thread price: $" << fixed << setprecision(2) << avgPrice << endl;
+
+    // ------------------- ENUM -------------------
+    Difficulty level;
+
+    if (avgPrice < 2.00)
+        level = EASY;
+    else if (avgPrice < 4.00)
+        level = INTERMEDIATE;
+    else
+        level = HARD;
+
+    cout << "\nBased on your average thread price, your hobby difficulty level is: ";
+
+    switch (level)
+    {
+    case EASY:
+        cout << "Easy (budget-friendly hobby!)" << endl;
+        break;
+    case INTERMEDIATE:
+        cout << "Intermediate (moderate cost)" << endl;
+        break;
+    case HARD:
+        cout << "Hard (premium materials!)" << endl;
+        break;
+    }
 
     //while loop, condition based
     string status;
@@ -257,4 +396,6 @@ int main()
     } 
     while (answer == "yes");
     cout << "You completed " << ColorCompleted << " colors total." << endl;
+    
+    return 0;
  }
