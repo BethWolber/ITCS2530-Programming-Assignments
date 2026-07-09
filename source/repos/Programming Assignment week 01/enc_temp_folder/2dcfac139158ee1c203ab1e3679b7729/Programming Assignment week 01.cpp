@@ -231,7 +231,7 @@ int main()
 
     cout << "Average stitches per session:  " << AverageSessionStitches(sessions, SESSION_COUNT) << endl;
     
-    // Make Input function 
+
     //new input #1
     int progress;
     cout << "How many pieces are you currently working on? ";
@@ -256,11 +256,7 @@ int main()
     cout << "How much do you currently pay for each skein of thread? ";
     cin >> price;
     cout << endl;
-    
-    // end of input function 
 
-
-    // Summary function 
     //creating a summary table to display inputs just given
     cout << setw(1) << "favorite pattern: ";
     cout << setw(2) << favorite << endl;
@@ -272,8 +268,6 @@ int main()
     cout << setw(8) << time << endl;
 
     cout << "\n";
-    
-    // End of summary function
 
     //first if/else block
     int amount;
@@ -307,7 +301,6 @@ int main()
 
     MenuDisplay(percent, price);
 
-    // Sticthes per day function
     int StitchesInADay;
     int StitchesInAWeek = 0;
     int stitchArray[7];
@@ -333,8 +326,6 @@ int main()
 
     cout << "On average, you complete " << StitchesInAWeek / 7 << " stitches a day." << endl;
 
-    // End of stitches per day function 
-
     // ------------------- NEW ARRAY FEATURE -------------------
     const int PRICE_COUNT = 5;
     double priceArray[PRICE_COUNT];
@@ -345,7 +336,6 @@ int main()
     double avgPrice = averagePrices(priceArray, PRICE_COUNT);
 
     cout << "\nAverage thread price: $" << fixed << setprecision(2) << avgPrice << endl;
-
 
     // ------------------- ENUM -------------------
     Difficulty level;
