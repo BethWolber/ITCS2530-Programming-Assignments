@@ -1,0 +1,18 @@
+--- Cross Stitch Report ---
+
+Session 1:
+Date: MON
+Stitches: 8
+Difficulty: Hard
+
+Session 2:
+Date: TUE
+Stitches: 7
+Difficulty: Intermediate
+
+Session 3:
+Date: WED
+Stitches: 5
+Difficulty: Easy
+
+Average stitches per session: 6.66667
