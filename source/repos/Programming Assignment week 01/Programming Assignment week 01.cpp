@@ -1,11 +1,15 @@
-//including iostream for input/output, including string to store user's input, using namespace std; to make code cleaner
 #include <iostream>
 #include <string>
 #include <iomanip>
 #include <limits>
 #include <windows.h>
+#include <fstream>
 using namespace std;
- 
+
+void MenuDisplay(int percent, double price);
+void ChangeConsoleColor();
+
+
 // ------------------- MEMBERSHIP STRUCT -------------------
 struct clubMembership {
     string name;
@@ -22,7 +26,6 @@ struct stitchSession {
     int stitches;
     Difficulty level;
 };
-
 
 // ------------------- FUNCTION USING ARRAY -------------------
 double averagePrices(const double prices[], int size)
@@ -53,6 +56,7 @@ void fillPrices(double prices[], int size)
         prices[i] = value;
     }
 }
+
 // ------------------ FUNCTION FOR STRUCT ------------------ 
 void FillSession(stitchSession& session)
 {
@@ -68,6 +72,7 @@ void FillSession(stitchSession& session)
 
     session.level = static_cast<Difficulty>(lvl);
 }
+
 void PrintSession(const stitchSession& session)
 {
     cout << "Date: " << session.date << endl;
@@ -76,14 +81,14 @@ void PrintSession(const stitchSession& session)
     cout << "Difficulty: ";
     switch (session.level)
     {
-    case EASY: 
+    case EASY:
         cout << "Easy";
         break;
-    case INTERMEDIATE: 
-        cout << "Intermediate"; 
+    case INTERMEDIATE:
+        cout << "Intermediate";
         break;
-    case HARD: 
-        cout << "Hard"; 
+    case HARD:
+        cout << "Hard";
         break;
     }
 }
@@ -97,11 +102,129 @@ double AverageSessionStitches(const stitchSession sessions[], int size)
     return static_cast<double>(total) / size;
 }
 
+// ------------------- CLASS -------------------
+class CrossStitchTracker
+{
+private:
+    static const int SESSION_COUNT = 3;
+    stitchSession sessions[SESSION_COUNT];
+    int sessionIndex;
+
+    static const int PRICE_COUNT = 5;
+    double priceArray[PRICE_COUNT];
+
+public:
+    // Constructor
+    CrossStitchTracker()
+    {
+        sessionIndex = 0;
+        for (int i = 0; i < SESSION_COUNT; i++)
+        {
+            sessions[i].date = "";
+            sessions[i].stitches = 0;
+            sessions[i].level = EASY;
+        }
+        for (int i = 0; i < PRICE_COUNT; i++)
+            priceArray[i] = 0.0;
+    }
+
+    // Add a stitching session
+    void addSession()
+    {
+        if (sessionIndex >= SESSION_COUNT)
+        {
+            cout << "Session limit reached!" << endl;
+            return;
+        }
+
+        cout << "\n--- Enter Stitching Session " << (sessionIndex + 1) << " ---\n";
+        FillSession(sessions[sessionIndex]);
+        sessionIndex++;
+    }
+
+    // Display all sessions
+    void showSessions() const
+    {
+        cout << "\n--- Stitching Session Summary ---\n";
+        for (int i = 0; i < sessionIndex; i++)
+        {
+            PrintSession(sessions[i]);
+            cout << endl;
+        }
+    }
+
+    // Compute average stitches
+    double computeAverageStitches() const
+    {
+        if (sessionIndex == 0)
+            return 0.0;
+
+        return AverageSessionStitches(sessions, sessionIndex);
+    }
+
+    // Fill price array
+    void fillPriceArray()
+    {
+        cout << "\nLet's record the last " << PRICE_COUNT << " thread prices you paid.\n";
+        fillPrices(priceArray, PRICE_COUNT);
+    }
+
+    double computeAveragePrice() const
+    {
+        return averagePrices(priceArray, PRICE_COUNT);
+    }
+
+    // Show menu
+    void showMenu(int percent, double price)
+    {
+        MenuDisplay(percent, price);
+    }
+
+    // Change console color
+    void changeColor()
+    {
+        ChangeConsoleColor();
+    }
+
+    // Save report to file
+    void saveReportToFile(const string& filename) const
+    {
+        ofstream out(filename);
+        if (!out)
+        {
+            cout << "Error opening file!" << endl;
+            return;
+        }
+
+        out << "--- Cross Stitch Report ---\n\n";
+
+        for (int i = 0; i < sessionIndex; i++)
+        {
+            out << "Session " << (i + 1) << ":\n";
+            out << "Date: " << sessions[i].date << "\n";
+            out << "Stitches: " << sessions[i].stitches << "\n";
+
+            out << "Difficulty: ";
+            switch (sessions[i].level)
+            {
+            case EASY: out << "Easy"; break;
+            case INTERMEDIATE: out << "Intermediate"; break;
+            case HARD: out << "Hard"; break;
+            }
+            out << "\n\n";
+        }
+
+        out << "Average stitches per session: " << computeAverageStitches() << "\n";
+
+        out.close();
+        cout << "Report saved to " << filename << endl;
+    }
+};
+
 //function to display banner
 bool PrintBanner()
 {
     HANDLE h = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(h, 13);
 
     cout << "Welcome! This program was created to help keep track of information related to cross stitching as a hobby!" << endl;
 
@@ -123,9 +246,29 @@ bool PrintBanner()
     }
     else
     {
-        cout << "No membership? No problem, enjoy the program!" << endl;
+        char choice;
+        cout << "Would you like to create a membership? (Y/N): ";
+        cin >> choice;
+
+        if (choice == 'Y' || choice == 'y')
+        {
+            clubMembership newMember;
+            cout << "Enter your name: ";
+            cin >> newMember.name;
+            cout << "Enter your phone number: ";
+            cin >> newMember.number;
+            cout << "Enter donation amount: ";
+            cin >> newMember.memberDonation;
+
+            cout << "Thank you for becoming a member, " << newMember.name << "!" << endl;
+        }
+        else
+        {
+            cout << "No problem, enjoy the program!" << endl;
+        }
     }
 
+    SetConsoleTextAttribute(h, 13);
     return hasMembership;
 }
 
@@ -139,22 +282,19 @@ void ChangeConsoleColor()
     SetConsoleTextAttribute(h, color);
 }
 
-//function to collect and validate inout
+//function to collect and validate input
 void PatternProgress()
 {
-    //first question, get pattern
     string pattern;
     cout << "What cross stitch pattern are you currently working on? ";
     cin >> pattern;
     cout << endl;
 
-    //second question, ask amount of days
     string days;
     cout << "How many days have you been working on that pattern? ";
     cin >> days;
     cout << endl;
 
-    //third question, ask for number of stitches
     string stitch;
     cout << "How many stitches have you made so far? ";
     cin >> stitch;
@@ -166,7 +306,6 @@ void PatternProgress()
         << " stitches so far. Nice work!" << endl;
 
     cout << "\n";
-
 }
 
 //function to display the menu
@@ -207,61 +346,44 @@ void ExactPercentage()
 
 int main()
 {
+    CrossStitchTracker tracker;
+
     PrintBanner();
-
-    ChangeConsoleColor();
-
+    tracker.changeColor();
     PatternProgress();
 
-    const int SESSION_COUNT = 3;
-    stitchSession sessions[SESSION_COUNT];
+    // Add stitching sessions
+    for (int i = 0; i < 3; i++)
+        tracker.addSession();
 
-    cout << "Enter stitching session data: " << endl;
-    for (int i = 0; i < SESSION_COUNT; i++)
-    {
-        cout << "Session " << (i + 1) << ":" << endl;
-        FillSession(sessions[i]);
-    }
-    cout << "Session Summary: " << endl;
-    for (int i = 0; i < SESSION_COUNT; i++)
-    {
-        PrintSession(sessions[i]);
-        cout << endl;
-    }
+    tracker.showSessions();
 
-    cout << "Average stitches per session:  " << AverageSessionStitches(sessions, SESSION_COUNT) << endl;
-    
-    // Make Input function 
-    //new input #1
+    cout << "Average stitches per session: "
+        << tracker.computeAverageStitches() << endl;
+
+    tracker.fillPriceArray();
+    tracker.saveReportToFile("CrossStitchReport.txt");
+
+    // Input section 
     int progress;
     cout << "How many pieces are you currently working on? ";
     cin >> progress;
-    cout << endl;
 
-    //new input #3
     string favorite;
     cout << "What is your favorite pattern you have completed so far? ";
     cin.ignore((numeric_limits<streamsize>::max)(), '\n');
     getline(cin, favorite);
-    cout << endl;
 
-    //new input #4, derived value
     string time;
     cout << "About how long has it been since you first started cross stitching? ";
-    getline (cin, time);
-    cout << endl;
+    getline(cin, time);
 
-    //new input #2, moved down to use with if/else block
     double price;
     cout << "How much do you currently pay for each skein of thread? ";
     cin >> price;
     cout << endl;
-    
-    // end of input function 
 
-
-    // Summary function 
-    //creating a summary table to display inputs just given
+    // Summary table 
     cout << setw(1) << "favorite pattern: ";
     cout << setw(2) << favorite << endl;
     cout << setw(3) << "number of pieces currently working on: ";
@@ -272,8 +394,6 @@ int main()
     cout << setw(8) << time << endl;
 
     cout << "\n";
-    
-    // End of summary function
 
     //first if/else block
     int amount;
@@ -282,12 +402,10 @@ int main()
     int own;
     cout << "How many embroidery hoops do you already have at home? ";
     cin >> own;
-    if (own>=10 && amount >= 10)
+    if (own >= 10 && amount >= 10)
         cout << "You have too many embroidery hoops! Make a list of what sizes you have before buying more and ending up with duplicates." << endl;
     else
         cout << "You probably have a reasonable amount of embroidery hoops." << endl;
-
-    cout << "\n";
 
     ExactPercentage();
 
@@ -297,57 +415,45 @@ int main()
     cin >> percent;
     if (percent > 50)
         cout << "You are more than halfway through your project! Keep up the great work :)" << endl;
+    else if (percent == 50)
+        cout << "You are exactly halfway through your project!" << endl;
     else
-        if (percent == 50)
-            cout << "You are exactly halfway through your project!" << endl;
-        else
-            cout << "You are less than halfway through your project. Keep going, and before you know it, it will start to come together!" << endl;
+        cout << "You are less than halfway through your project. Keep going, and before you know it, it will start to come together!" << endl;
 
     cout << "\n";
 
-    MenuDisplay(percent, price);
+    tracker.showMenu(percent, price);
 
-    // Sticthes per day function
+    // Stitches per day function
     int StitchesInADay;
     int StitchesInAWeek = 0;
     int stitchArray[7];
 
-    for (int day = 1; day <= 7; day++)
+    enum Day { MON, TUE, WED, THU, FRI, SAT, SUN };
+    string dayNames[7] = { "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
+
+    for (int day = MON; day <= SUN; day++)
     {
-        cout << "Enter the number of stitches you completed today: ";
+        cout << "Enter the number of stitches you completed " << dayNames[day] << ": ";
         cin >> StitchesInADay;
-        cout << endl;
 
         StitchesInAWeek += StitchesInADay;
-        stitchArray[day - 1] = StitchesInADay;
-
-        cout << "Stored: " << stitchArray[day - 1] << endl;
+        stitchArray[day] = StitchesInADay;
     }
-
-    enum Day { MON, TUE, WED, THU, FRI, SAT, SUN };
 
     for (int i = MON; i <= SUN; i++)
     {
-        cout << "Day " << (i + 1) << ": " << stitchArray[i] << endl;
+        cout << dayNames[i] << ": " << stitchArray[i] << endl;
     }
 
     cout << "On average, you complete " << StitchesInAWeek / 7 << " stitches a day." << endl;
 
-    // End of stitches per day function 
-
-    // ------------------- NEW ARRAY FEATURE -------------------
-    const int PRICE_COUNT = 5;
-    double priceArray[PRICE_COUNT];
-
-    cout << "\nLet's record the last " << PRICE_COUNT << " thread prices you paid.\n";
-    fillPrices(priceArray, PRICE_COUNT);
-
-    double avgPrice = averagePrices(priceArray, PRICE_COUNT);
+    // Average price from class
+    double avgPrice = tracker.computeAveragePrice();
 
     cout << "\nAverage thread price: $" << fixed << setprecision(2) << avgPrice << endl;
 
-
-    // ------------------- ENUM -------------------
+    // ENUM based on avgPrice
     Difficulty level;
 
     if (avgPrice < 2.00)
@@ -403,9 +509,8 @@ int main()
             ColorCompleted = ColorCompleted + 1;
             cout << "You have completed " << ColorCompleted << " colors so far." << endl;
         }
-    } 
-    while (answer == "yes");
+    } while (answer == "yes");
     cout << "You completed " << ColorCompleted << " colors total." << endl;
-    
+
     return 0;
- }
+}
